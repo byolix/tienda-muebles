@@ -1,12 +1,13 @@
-// Revisa periódicamente la carpeta de Google Drive configurada.
-// Por cada foto nueva: la descarga, se la pasa a Claude Vision,
-// y guarda el producto resultante en la base de datos.
+// Modo de autenticación: CUENTA DE SERVICIO.
+// Google NO permite listar archivos de una carpeta (files.list) solo con
+// una API key simple, aunque la carpeta sea pública — exige una cuenta de
+// servicio. La carpeta debe compartirse con el correo de la cuenta de
+// servicio (termina en ...iam.gserviceaccount.com) con permiso de Lector.
 //
-// Modo de autenticación: API KEY (simple).
-// Solo funciona si la carpeta de Drive está compartida como
-// "Cualquiera con el enlace → Lector". Si en algún momento la carpeta
-// pasa a ser privada, hay que cambiar a autenticación por cuenta de
-// servicio (dejamos ese modo comentado más abajo por si migras después).
+// La credencial se pasa como el JSON completo de la cuenta de servicio en
+// la variable de entorno GOOGLE_SERVICE_ACCOUNT_JSON (todo el contenido del
+// archivo .json pegado como texto, no una ruta de archivo) — así funciona
+// igual en local que en un hosting como Railway, sin subir archivos aparte.
 
 const fs = require('fs');
 const { google } = require('googleapis');
@@ -17,23 +18,26 @@ const { regenerateFeed } = require('./whatsappFeed');
 const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
 
 function getDriveClient() {
-  const apiKey = process.env.GOOGLE_API_KEY;
-  if (!apiKey) {
+  const rawJson = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+  if (!rawJson) {
     throw new Error(
-      'Falta GOOGLE_API_KEY en el .env. Recuerda: la carpeta debe estar compartida como "Cualquiera con el enlace".'
+      'Falta GOOGLE_SERVICE_ACCOUNT_JSON en las variables. Debe ser el contenido completo del JSON de la cuenta de servicio, pegado como texto.'
     );
   }
-  return google.drive({ version: 'v3', auth: apiKey });
-}
 
-// ── Alternativa (carpeta privada) ──────────────────────────────────
-// function getDriveClientServiceAccount() {
-//   const auth = new google.auth.GoogleAuth({
-//     keyFile: process.env.GOOGLE_SERVICE_ACCOUNT_JSON,
-//     scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-//   });
-//   return google.drive({ version: 'v3', auth });
-// }
+  let credentials;
+  try {
+    credentials = JSON.parse(rawJson);
+  } catch (err) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_JSON no es un JSON válido. Revisa que se haya pegado completo, sin recortar.');
+  }
+
+  const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  });
+  return google.drive({ version: 'v3', auth });
+}
 
 async function listNewImages(drive) {
   const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
@@ -74,7 +78,6 @@ async function processNewImages() {
       const imageBuffer = await downloadImage(drive, file.id);
       const extracted = await extractProductFromImage(imageBuffer, file.mimeType);
 
-      // Guarda una copia local de la imagen para servirla desde la tienda
       const localFileName = `${file.id}.jpg`;
       const localPath = require('path').join(__dirname, '..', '..', 'public', 'uploads', localFileName);
       fs.mkdirSync(require('path').dirname(localPath), { recursive: true });
@@ -97,7 +100,6 @@ async function processNewImages() {
       console.log(`[driveWatcher] Producto creado: ${extracted.title} (needs_review=${needsReview})`);
     } catch (err) {
       console.error(`[driveWatcher] Error procesando ${file.name}:`, err.message);
-      // No se marca como procesado: se reintentará en el siguiente ciclo.
     }
   }
 

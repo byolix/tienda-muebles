@@ -118,4 +118,5 @@ function startPolling() {
 }
 
 module.exports = { startPolling, processNewImages };
+//
 

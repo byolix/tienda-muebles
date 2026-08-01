@@ -1,0 +1,211 @@
+:root {
+  --ink: #2A2420;
+  --linen: #F7F3EC;
+  --linen-dim: #EFE9DE;
+  --pine: #3F5B45;
+  --pine-dark: #2C4331;
+  --walnut: #9C6B3E;
+  --muted: #8A8074;
+  --card: #FFFFFF;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--linen);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, sans-serif;
+  line-height: 1.5;
+}
+
+h1, h2, h3, .brand {
+  font-family: 'Fraunces', serif;
+}
+
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header */
+.site-header {
+  border-bottom: 1px solid var(--linen-dim);
+  padding: 18px 0;
+  position: sticky;
+  top: 0;
+  background: rgba(247, 243, 236, 0.92);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+}
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand em {
+  color: var(--walnut);
+  font-style: normal;
+  margin: 0 4px;
+}
+.cats {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.cats button {
+  border: none;
+  background: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+}
+.cats button.active,
+.cats button:hover {
+  color: var(--pine-dark);
+  border-bottom-color: var(--pine);
+}
+
+/* Hero */
+.hero {
+  padding: 56px 0 40px;
+}
+.hero h1 {
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 600;
+  max-width: 18ch;
+  margin: 0 0 12px;
+  color: var(--ink);
+}
+.hero p {
+  max-width: 46ch;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 22px;
+  padding: 0 0 60px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(42, 36, 32, 0.04);
+  border: 1px solid var(--linen-dim);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(42, 36, 32, 0.08);
+}
+.card img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--linen-dim);
+}
+.card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.card-cat {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--walnut);
+  font-weight: 600;
+}
+.card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+}
+.card-desc {
+  font-size: 0.88rem;
+  color: var(--muted);
+  flex: 1;
+}
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.card-price {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.btn-whatsapp {
+  background: var(--pine);
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.btn-whatsapp:hover { background: var(--pine-dark); }
+
+.empty {
+  color: var(--muted);
+  padding: 40px 0;
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--linen-dim);
+  padding: 26px 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.site-footer a {
+  color: var(--pine-dark);
+  font-weight: 600;
+}
+
+/* Product detail */
+.product-detail {
+  padding: 40px 0 70px;
+}
+.product-detail .layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 40px;
+}
+@media (max-width: 720px) {
+  .product-detail .layout { grid-template-columns: 1fr; }
+}
+.product-detail img {
+  width: 100%;
+  border-radius: var(--radius);
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+.product-detail .price {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 10px 0 18px;
+}
